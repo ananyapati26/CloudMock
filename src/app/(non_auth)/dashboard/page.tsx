@@ -1,9 +1,16 @@
-import React from 'react'
+import ProjectsCards from "@/components/dashboard/Projects";
+import StatsCards from "@/components/dashboard/TotalStats";
+import React from "react";
 
-const Dashboard = () => {
+export default function Dashboard() {
   return (
-    <div>page</div>
-  )
-}
+    <>
+      <div className="flex flex-col pt-6 gap-5">
 
-export default Dashboard
+        <StatsCards />
+        <div className="font-bold underline text-xl ml-2">My Projects</div>
+        <ProjectsCards />
+      </div>
+    </>
+  );
+}
