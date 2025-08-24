@@ -1,10 +1,17 @@
-import { db } from "@/lib/prisma";
+import { db } from "@/src/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest,
-    { params }: { params: { slug: string } }) {
+type RouteParams = {
+    slug: string;
+}
+
+export async function POST(
+    req: NextRequest,
+    { params }: { params: Promise<RouteParams> }
+) {
     try {
-        const { slug } = params;
+        // Await the params promise in Next.js 15
+        const { slug } = await params;
 
         const body = await req.json();
         const { collectionId } = body;

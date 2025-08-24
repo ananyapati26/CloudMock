@@ -1,10 +1,17 @@
-import { db } from "@/lib/prisma";
+import { db } from "@/src/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest, context: { params: { slug: string } }) {
-    try {
-        const { slug } = await context.params; // <-- await here
+type RouteParams = {
+    slug: string;
+}
 
+export async function POST(
+    req: NextRequest,
+    { params }: { params: Promise<RouteParams> }
+) {
+    try {
+        // Await the params promise in Next.js 15
+        const { slug } = await params;
         if (!slug) {
             return NextResponse.json({ error: 'Missing slug' }, { status: 400 });
         }

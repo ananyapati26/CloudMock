@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,12 +10,13 @@ import {
   DialogTrigger,
   DialogClose,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/src/components/ui/dialog";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import Link from "next/link";
 
 export default function Navbar() {
   const router = useRouter();
@@ -49,14 +50,15 @@ export default function Navbar() {
       setSlug("");
 
       router.refresh(); // ✅ Re-render the page after project creation
-    } catch (error: any) {
-      if (error.response?.status === 409) {
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      if (err.response?.status === 409) {
         alert("Slug must be unique");
       } else {
-        alert("Failed to create project");
+        alert(err.response?.data?.message || "Failed to create project");
       }
-    }
-  };
+    };
+  }
 
   return (
     <div className="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-900/50 backdrop-blur-lg">
@@ -69,11 +71,10 @@ export default function Navbar() {
           CloudMocker
         </div>
 
-        {/* Links + Actions */}
         <div className="flex items-center gap-6">
-          <a href="#" className="text-slate-400 hover:text-white transition">
+          <Link href="#" className="text-slate-400 hover:text-white transition">
             Projects
-          </a>
+          </Link>
 
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>

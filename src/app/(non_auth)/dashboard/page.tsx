@@ -1,5 +1,5 @@
-import ProjectsCards from "@/components/dashboard/Projects";
-import StatsCards from "@/components/dashboard/TotalStats";
+import ProjectsCards from "@/src/components/dashboard/Projects";
+import StatsCards from "@/src/components/dashboard/TotalStats";
 
 export default function Dashboard() {
   return (

@@ -5,7 +5,8 @@ interface Collection {
   name: string;
   description: string;
   path: string;
-  baseData: any;
+  baseData: Record<string, unknown>;
+
 }
 
 export default function CollectionList({

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,10 +10,10 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/src/components/ui/dialog";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
+import { Textarea } from "@/src/components/ui/textarea";
 import { useParams } from "next/navigation";
 
 interface CreateCollectionDialogProps {
@@ -39,7 +39,7 @@ export default function CreateCollectionDialog({ onCollectionCreated }: CreateCo
       const path = formData.get("path");
       const description = formData.get("description");
 
-      let baseDataParsed: any = null;
+      let baseDataParsed: Record<string, unknown> | null = null;
       if (generatedOutput) {
         try {
           const cleanedOutput = generatedOutput
@@ -48,10 +48,14 @@ export default function CreateCollectionDialog({ onCollectionCreated }: CreateCo
             .replace(/,\s*}/g, "}");
           baseDataParsed = JSON.parse(cleanedOutput);
         } catch {
-          baseDataParsed = generatedOutput;
+          baseDataParsed = null;
         }
       } else {
-        baseDataParsed = prompt;
+        try {
+          baseDataParsed = JSON.parse(prompt);
+        } catch {
+          baseDataParsed = null;
+        }
       }
 
       await axios.post(`/api/projects/${slug}/CreateCollection`, {

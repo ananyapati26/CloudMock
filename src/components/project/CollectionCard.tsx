@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import { Plus } from "lucide-react";
 import { Copy, Check } from "lucide-react";
 
@@ -25,7 +25,8 @@ export default function CollectionCard({
     name: string;
     description: string;
     baseUrl: string;
-    sampleResponse: any;
+    sampleResponse: Record<string, unknown>;
+
 }) {
     const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
     const [loading, setLoading] = useState(true);

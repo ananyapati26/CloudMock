@@ -1,169 +1,172 @@
 "use client";
 
 import * as React from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormControl,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+    Form,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+    FormControl,
+} from "@/src/components/ui/form";
+import { Input } from "@/src/components/ui/input";
+import { Button } from "@/src/components/ui/button";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-// import { useToast } from "@/components/ui/use-toast";
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+    CardFooter,
+} from "@/src/components/ui/card";
+// import { useToast } from "@/src/components/ui/use-toast";
 import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 const LoginSchema = z.object({
-  email: z.string().email("Use a valid email"),
-  password: z
-    .string()
-    .min(6, "Min 6 characters")
-    .max(128, "That’s… a bit much"),
+    email: z.string().email("Use a valid email"),
+    password: z
+        .string()
+        .min(6, "Min 6 characters")
+        .max(128, "That’s… a bit much"),
 });
 
 type LoginValues = z.infer<typeof LoginSchema>;
 
 export default function LoginPage() {
-  const router = useRouter();
-//   const { toast } = useToast();
-  const [showPassword, setShowPassword] = React.useState(false);
+    const router = useRouter();
+    //   const { toast } = useToast();
+    const [showPassword, setShowPassword] = React.useState(false);
 
-  const form = useForm<LoginValues>({
-    resolver: zodResolver(LoginSchema),
-    defaultValues: { email: "", password: "" },
-    mode: "onTouched",
-  });
+    const form = useForm<LoginValues>({
+        resolver: zodResolver(LoginSchema),
+        defaultValues: { email: "", password: "" },
+        mode: "onTouched",
+    });
 
-  const onSubmit = async (values: LoginValues) => {
-    try {
-      const res = await axios.post("/api/users/LoginUser", values);
-      const { user } = res.data ?? {};
-      if (user?.id) {
-        localStorage.setItem("userId", user.id);
-      }
-    //   toast({ title: "Welcome back 👋" });
-      router.push("/dashboard");
-    } catch (err: any) {
-      const serverMsg =
-        err?.response?.data?.message ||
-        "Login failed. Check your credentials and try again.";
-    //   toast({ title: "Oops", description: serverMsg, variant: "destructive" });
-      form.setError("email", { message: "" }); 
-      form.setError("password", { message: "" });
-    }
-  };
+    const onSubmit = async (values: LoginValues) => {
+        try {
+            const res = await axios.post("/api/users/LoginUser", values);
+            const { user } = res.data ?? {};
+            if (user?.id) {
+                localStorage.setItem("userId", user.id);
+            }
+            //   toast({ title: "Welcome back 👋" });
+            router.push("/dashboard");
+        }
+        catch (err: unknown) {
+            const error = err as AxiosError<{ message?: string }>;
+            const serverMsg =
+                error.response?.data?.message ||
+                "Login failed. Check your credentials and try again.";
 
-  const isSubmitting = form.formState.isSubmitting;
+            // toast({ title: "Oops", description: serverMsg, variant: "destructive" });
+            form.setError("email", { message: "" });
+            form.setError("password", { message: "" });
+        }
+    };
 
-  return (
-    <div className="min-h-screen w-full grid place-items-center bg-background px-4">
-      <Card className="w-full max-w-sm shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl">Sign in</CardTitle>
-          <CardDescription>Access your dashboard in seconds.</CardDescription>
-        </CardHeader>
+    const isSubmitting = form.formState.isSubmitting;
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-60" />
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="email"
-                          inputMode="email"
-                          autoComplete="email"
-                          placeholder="you@example.com"
-                          className="pl-9"
-                        />
-                      </FormControl>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    return (
+        <div className="min-h-screen w-full grid place-items-center bg-background px-4">
+            <Card className="w-full max-w-sm shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-2xl">Sign in</CardTitle>
+                    <CardDescription>Access your dashboard in seconds.</CardDescription>
+                </CardHeader>
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-60" />
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type={showPassword ? "text" : "password"}
-                          autoComplete="current-password"
-                          placeholder="••••••••"
-                          className="pl-9 pr-10"
-                        />
-                      </FormControl>
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((s) => !s)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-muted focus:outline-none"
-                        aria-label={showPassword ? "Hide password" : "Show password"}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4 opacity-70" />
-                        ) : (
-                          <Eye className="h-4 w-4 opacity-70" />
-                        )}
-                      </button>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <CardContent className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <div className="relative">
+                                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-60" />
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    type="email"
+                                                    inputMode="email"
+                                                    autoComplete="email"
+                                                    placeholder="you@example.com"
+                                                    className="pl-9"
+                                                />
+                                            </FormControl>
+                                        </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-            <CardFooter className="flex flex-col gap-3">
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isSubmitting}
-                aria-disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <span className="inline-flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Logging in…
-                  </span>
-                ) : (
-                  "Login"
-                )}
-              </Button>
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <div className="relative">
+                                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-60" />
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    type={showPassword ? "text" : "password"}
+                                                    autoComplete="current-password"
+                                                    placeholder="••••••••"
+                                                    className="pl-9 pr-10"
+                                                />
+                                            </FormControl>
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword((s) => !s)}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-muted focus:outline-none"
+                                                aria-label={showPassword ? "Hide password" : "Show password"}
+                                            >
+                                                {showPassword ? (
+                                                    <EyeOff className="h-4 w-4 opacity-70" />
+                                                ) : (
+                                                    <Eye className="h-4 w-4 opacity-70" />
+                                                )}
+                                            </button>
+                                        </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </CardContent>
 
-              <div className="text-xs text-muted-foreground text-center">
-                By continuing you agree to our Terms & Privacy.
-              </div>
-            </CardFooter>
-          </form>
-        </Form>
-      </Card>
-    </div>
-  );
+                        <CardFooter className="flex flex-col gap-3">
+                            <Button
+                                type="submit"
+                                className="w-full"
+                                disabled={isSubmitting}
+                                aria-disabled={isSubmitting}
+                            >
+                                {isSubmitting ? (
+                                    <span className="inline-flex items-center gap-2">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Logging in…
+                                    </span>
+                                ) : (
+                                    "Login"
+                                )}
+                            </Button>
+
+                            <div className="text-xs text-muted-foreground text-center">
+                                By continuing you agree to our Terms & Privacy.
+                            </div>
+                        </CardFooter>
+                    </form>
+                </Form>
+            </Card>
+        </div>
+    );
 }

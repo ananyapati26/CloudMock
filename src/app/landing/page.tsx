@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/src/components/ui/button';
+import { Card, CardContent } from '@/src/components/ui/card';
+import { Badge } from '@/src/components/ui/badge';
 import {
     Cloud,
     Zap,
@@ -142,7 +142,7 @@ export default function Landing() {
                         Perfect for any use case
                     </h2>
                     <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-                        Whether you're building a prototype or testing in production, CloudMocker has you covered.
+                        Whether you&apos;re building a prototype or testing in production, CloudMocker has you covered.
                     </p>
                 </div>
 
