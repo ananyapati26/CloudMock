@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,72 +15,139 @@ import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
-export default function AppNavbar() {
-  const router = useRouter()
+export default function Navbar() {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [desc, setDesc] = useState("");
+  const [slug, setSlug] = useState("");
+  const [userId, setUserId] = useState("");
 
-const [open,setOpen] = useState(false);
+  useEffect(() => {
+    const storedId = localStorage.getItem("userId");
+    if (storedId) setUserId(storedId);
+  }, []);
 
- const handleSubmit = () => {
-    setOpen(false);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !desc || !slug) {
+      alert("Please fill all fields");
+      return;
+    }
+    try {
+      await axios.post("/api/projects/CreateProject", {
+        name,
+        desc,
+        slug,
+        userId,
+      });
+      setOpen(false);
+      setName("");
+      setDesc("");
+      setSlug("");
+
+      router.refresh(); // ✅ Re-render the page after project creation
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        alert("Slug must be unique");
+      } else {
+        alert("Failed to create project");
+      }
+    }
   };
 
   return (
-    <>
-      <div className="w-full flex border-b justify-between sticky top-0 p-6 bg-white">
-        <div className="text-xl font-bold">MyDashboard</div>
-        <div className=" flex items-center gap-4">
-          <a href="#" className="hover:text-primary">
+    <div className="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-900/50 backdrop-blur-lg">
+      <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+        {/* Logo */}
+        <div
+          className="text-2xl font-bold cursor-pointer bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent hover:opacity-90 transition"
+          onClick={() => router.push("/dashboard")}
+        >
+          CloudMocker
+        </div>
+
+        {/* Links + Actions */}
+        <div className="flex items-center gap-6">
+          <a href="#" className="text-slate-400 hover:text-white transition">
             Projects
           </a>
+
           <Dialog open={open} onOpenChange={setOpen}>
-            <form>
-              <DialogTrigger asChild>
-                <Button variant={"secondary"} className="cursor-pointer">Add Project</Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Edit profile</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-4">
-                  <div className="grid gap-3">
-                    <Label htmlFor="name-1">Project Name</Label>
-                    <Input id="name-1" name="name" placeholder="Project Name" />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      name="description"
-                      placeholder="Description"
+            <DialogTrigger asChild>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                Add Project
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-slate-900 text-white border border-slate-700 rounded-xl">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-semibold">
+                  Add Project
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit}>
+                <div className="grid gap-4 mt-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name-1" className="text-slate-300">
+                      Project Name
+                    </Label>
+                    <Input
+                      id="name-1"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Project Name"
+                      className="bg-slate-800 border-slate-700 text-white"
                     />
                   </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="description">Base URL Path</Label>
+                  <div className="grid gap-2">
+                    <Label htmlFor="description" className="text-slate-300">
+                      Description
+                    </Label>
+                    <Textarea
+                      id="description"
+                      value={desc}
+                      onChange={(e) => setDesc(e.target.value)}
+                      placeholder="Description"
+                      className="bg-slate-800 border-slate-700 text-white"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="slug" className="text-slate-300">
+                      Base URL Path
+                    </Label>
                     <div className="flex gap-2">
                       <Input
-                        id="url"
-                        name="url"
                         disabled
-                        defaultValue="My path"
+                        value={`${process.env.NEXT_PUBLIC_API_URL}/${userId}`}
+                        className="bg-slate-800 border-slate-700 text-white"
                       />
-                      <Input id="url" name="url" placeholder="name" />
+                      <Input
+                        id="slug"
+                        value={slug}
+                        onChange={(e) => setSlug(e.target.value)}
+                        placeholder="slug"
+                        className="bg-slate-800 border-slate-700 text-white"
+                      />
                     </div>
                   </div>
                 </div>
-                <DialogFooter>
+                <DialogFooter className="mt-6">
                   <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
+                    <Button variant="outline" className="border-slate-600 text-black">
+                      Cancel
+                    </Button>
                   </DialogClose>
-                  <Button type="submit" onClick={handleSubmit}>Save changes</Button>
+                  <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    Save changes
+                  </Button>
                 </DialogFooter>
-              </DialogContent>
-            </form>
+              </form>
+            </DialogContent>
           </Dialog>
         </div>
       </div>
-    </>
+    </div>
   );
 }
-
-
