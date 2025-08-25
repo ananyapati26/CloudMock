@@ -10,7 +10,6 @@ export async function POST(
     { params }: { params: Promise<RouteParams> }
 ) {
     try {
-        // Await the params promise in Next.js 15
         const { slug } = await params;
         if (!slug) {
             return NextResponse.json({ error: 'Missing slug' }, { status: 400 });
@@ -25,7 +24,7 @@ export async function POST(
         }
 
         const body = await req.json();
-        const { collectionId, method } = body;
+        const { collectionId, method, userId } = body;
 
         const collection = await db.collection.findUnique({
             where: { id: collectionId },
@@ -35,10 +34,15 @@ export async function POST(
             return NextResponse.json({ error: 'Collection not found' }, { status: 404 });
         }
 
+        if(!userId){
+            return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+        }
+
         const endpoint = await db.endpoint.create({
             data: {
                 collectionId,
                 method,
+                userId,
                 response: collection.baseData,
             },
         });

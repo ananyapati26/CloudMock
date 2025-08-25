@@ -16,7 +16,7 @@ export default function CollectionList({
   collections: Collection[];
   slug: string;
 }) {
-  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : "null";
 
   return (
     <div className="space-y-6 bg-gray-900 text-gray-200 p-4 rounded-lg">

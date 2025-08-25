@@ -29,6 +29,7 @@ export default function CreateCollectionDialog({ onCollectionCreated }: CreateCo
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { slug } = useParams();
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : "null";
 
   const handleCreateCollection = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,6 +62,7 @@ export default function CreateCollectionDialog({ onCollectionCreated }: CreateCo
       await axios.post(`/api/projects/${slug}/CreateCollection`, {
         name,
         path,
+        userId,
         description,
         baseData: baseDataParsed,
       });
@@ -80,7 +82,9 @@ export default function CreateCollectionDialog({ onCollectionCreated }: CreateCo
     setGeneratedOutput("");
 
     try {
+      console.log("going to generate")
       const response = await axios.post("/api/generateApi", { prompt });
+
       if (response.data?.output) {
         const rawText = response.data.output;
         const jsonMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
@@ -153,7 +157,9 @@ export default function CreateCollectionDialog({ onCollectionCreated }: CreateCo
               />
               <Button
                 type="button"
-                onClick={handleGenerate}
+                onClick={async () => {
+                  await handleGenerate()
+                }}
                 disabled={isGenerating || !prompt.trim()}
                 className="bg-blue-600 hover:bg-blue-500 text-white"
               >

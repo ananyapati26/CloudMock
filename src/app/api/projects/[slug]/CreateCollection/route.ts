@@ -27,13 +27,14 @@ export async function POST(
         }
 
         const body = await req.json();
-        const { name, path, baseData, desc } = body;
+        const { name, path, baseData, desc, userId } = body;
 
         const collection = await db.collection.create({
             data: {
                 name,
                 path,
                 desc,
+                userId,
                 baseData,
                 projectId: project.id,
             },

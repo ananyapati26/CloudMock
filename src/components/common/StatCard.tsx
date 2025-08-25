@@ -2,10 +2,12 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/src/components/ui/ca
 
 interface StatCardProps {
   title: string;
-  value: string;
+  value: number;
   icon: React.ReactNode;
   iconBg?: string;
 }
+
+
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon, iconBg }) => {
   return (

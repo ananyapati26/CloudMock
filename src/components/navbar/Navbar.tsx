@@ -15,8 +15,14 @@ import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { useRouter } from "next/navigation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/src/components/ui/tooltip";
 import axios, { AxiosError } from "axios";
 import Link from "next/link";
+
 
 export default function Navbar() {
   const router = useRouter();
@@ -25,7 +31,7 @@ export default function Navbar() {
   const [desc, setDesc] = useState("");
   const [slug, setSlug] = useState("");
   const [userId, setUserId] = useState("");
-
+  
   useEffect(() => {
     const storedId = localStorage.getItem("userId");
     if (storedId) setUserId(storedId);
@@ -49,7 +55,7 @@ export default function Navbar() {
       setDesc("");
       setSlug("");
 
-      router.refresh(); // ✅ Re-render the page after project creation
+      router.refresh();
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       if (err.response?.status === 409) {
@@ -57,8 +63,9 @@ export default function Navbar() {
       } else {
         alert(err.response?.data?.message || "Failed to create project");
       }
-    };
-  }
+    }
+    
+  };
 
   return (
     <div className="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-900/50 backdrop-blur-lg">
@@ -119,11 +126,18 @@ export default function Navbar() {
                       Base URL Path
                     </Label>
                     <div className="flex gap-2">
-                      <Input
-                        disabled
-                        value={`${process.env.NEXT_PUBLIC_API_URL}/${userId}`}
-                        className="bg-slate-800 border-slate-700 text-white"
-                      />
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Input
+                            disabled
+                            value={`${process.env.NEXT_PUBLIC_API_URL}/${userId}`}
+                            className="bg-slate-800 border-slate-700 text-white"
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent side={"bottom"}>
+                          <p>{`${process.env.NEXT_PUBLIC_API_URL}/${userId}`}</p>
+                        </TooltipContent>
+                      </Tooltip>
                       <Input
                         id="slug"
                         value={slug}
@@ -136,11 +150,17 @@ export default function Navbar() {
                 </div>
                 <DialogFooter className="mt-6">
                   <DialogClose asChild>
-                    <Button variant="outline" className="border-slate-600 text-black">
+                    <Button
+                      variant="outline"
+                      className="border-slate-600 text-black"
+                    >
                       Cancel
                     </Button>
                   </DialogClose>
-                  <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
                     Save changes
                   </Button>
                 </DialogFooter>

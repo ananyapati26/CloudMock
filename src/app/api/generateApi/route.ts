@@ -10,16 +10,23 @@ export async function POST(req: NextRequest) {
     }
 
     try {
+        console.log("going to find api key")
         const apiKey = process.env.GEMINI_API_KEY;
+        console.log(apiKey)
         if (!apiKey) {
             return NextResponse.json({ error: 'Missing GEMINI_API_KEY environment variable' }, { status: 500 });
         }
         const genAI = new GoogleGenerativeAI(apiKey)
+        console.log("generating")
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
+        console.log("called")
 
+        
         const result = await model.generateContent(prompt)
+        console.log(result)
         const response = await result.response;
         const output = await response.text();
+        console.log(output)
 
         return NextResponse.json({ output });
     } catch (error) {
