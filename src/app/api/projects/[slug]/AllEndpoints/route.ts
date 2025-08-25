@@ -10,9 +10,6 @@ export async function POST(
     { params }: { params: Promise<RouteParams> }
 ) {
     try {
-        // Await the params promise in Next.js 15
-        // const { slug } = await params;
-
         const body = await req.json();
         const { collectionId } = body;
 

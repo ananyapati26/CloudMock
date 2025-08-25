@@ -1,15 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios"; // 1. Import axios
-import { formatDistanceToNow } from "date-fns"; 
+// import { formatDistanceToNow } from "date-fns"; 
 
 interface Activity {
   id: string;
-  type: "endpoint" | "test" | "collection";
+  type: string;
   title: string;
   project: string;
-  time: string;
-  status: "success" | "draft" | "updated";
+//   time: string;
+  status: string;
   method: string;
 }
 
@@ -35,7 +35,6 @@ export default function RecentActivity() {
         setLoading(true);
         setError(null);
 
-        // In a real app, you would get the userId from an auth hook or session
         const userId = localStorage.getItem("userId");
         if (!userId) {
           console.error("User ID not found in localStorage");
@@ -54,11 +53,11 @@ export default function RecentActivity() {
         const transformedActivities = response.data.map((endpoint) => ({
           id: endpoint.id,
           type: "endpoint",
-          title: `Endpoint Created`,
+          title: "Endpoint Created",
           project: endpoint.collection.name, 
-          time: formatDistanceToNow(new Date(endpoint.createdAt), {
-            addSuffix: true,
-          }),
+        //   time: formatDistanceToNow(new Date(endpoint.createdAt), {
+        //     addSuffix: true,
+        //   }),
           status: "success", 
           method: endpoint.method,
         }));
@@ -167,7 +166,7 @@ export default function RecentActivity() {
                     <span className="font-medium text-slate-300">
                       {activity.project}
                     </span>{" "}
-                    • {activity.time}
+                    {/* • {activity.time} */}
                   </div>
                 </div>
               </div>
