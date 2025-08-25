@@ -134,8 +134,8 @@ export default function CollectionCard({
 
       <div className="mb-6">
         <h3 className="font-semibold text-gray-200 mb-3">Sample Response</h3>
-        <pre className="bg-gray-800 p-4 rounded-xl text-xs overflow-x-auto text-gray-300">
-          <code>{JSON.stringify(sampleResponse, null, 2)}</code>
+        <pre className="bg-gray-800 p-4 rounded-xl text-xs overflow-x-auto text-gray-300 h-60 overflow-y-auto">
+          <code className="pt-4 pb-4">{JSON.stringify(sampleResponse, null, 2)}</code>
         </pre>
       </div>
     </div>
