@@ -58,7 +58,7 @@ export default function ProjectsCards(): React.ReactNode {
     return (
       <div className="flex flex-row flex-wrap justify-start items-start gap-6">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="w-[350px] h-[140px] bg-slate-900/60 rounded-xl p-5 animate-pulse flex items-center gap-4">
+          <div key={i} className="w-full h-[140px] bg-slate-900/60 rounded-xl p-5 animate-pulse flex items-center gap-4">
             <div className="w-12 h-12 bg-slate-700 rounded-xl flex-shrink-0"></div>
             <div className="flex-1 space-y-2">
               <div className="w-32 h-5 bg-slate-700 rounded"></div>
