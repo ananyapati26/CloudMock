@@ -21,8 +21,8 @@ export async function POST(req: NextRequest) {
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
         console.log("called")
 
-        
-        const result = await model.generateContent(prompt)
+
+        const result = await model.generateContent(prompt + 'generate dummy data for this in json format')
         console.log(result)
         const response = await result.response;
         const output = await response.text();
