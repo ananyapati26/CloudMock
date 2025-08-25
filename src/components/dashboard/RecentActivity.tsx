@@ -1,14 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
-import axios from "axios"; // 1. Import axios
-// import { formatDistanceToNow } from "date-fns";
+import axios from "axios"; 
+import { formatDistanceToNow } from "date-fns";
 
 interface Activity {
   id: string;
   type: string;
   title: string;
   project: string;
-  //   time: string;
+    time: string;
   status: string;
   method: string;
 }
@@ -56,9 +56,9 @@ export default function RecentActivity() {
           type: "endpoint",
           title: "Endpoint Created",
           project: endpoint.collection.name,
-          //   time: formatDistanceToNow(new Date(endpoint.createdAt), {
-          //     addSuffix: true,
-          //   }),
+            time: formatDistanceToNow(new Date(endpoint.createdAt), {
+              addSuffix: true,
+            }),
           status: "success",
           method: endpoint.method,
         }));
@@ -167,7 +167,7 @@ export default function RecentActivity() {
                     <span className="font-medium text-slate-300">
                       {activity.project}
                     </span>{" "}
-                    {/* • {activity.time} */}
+                    • {activity.time}
                   </div>
                 </div>
               </div>
