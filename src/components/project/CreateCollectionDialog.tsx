@@ -134,7 +134,7 @@ export default function CreateCollectionDialog({ onCollectionCreated }: CreateCo
                 <Button
                   type="button"
                   variant={baseType === "human" ? "default" : "outline"}
-                  className={baseType === "human" ? "bg-blue-600 text-white" : "border-gray-600 text-gray-300"}
+                  className={baseType === "human" ? "bg-blue-600 text-white" : "border-gray-600 text-black"}
                   onClick={() => setBaseType("human")}
                 >
                   Humanized Prompt
