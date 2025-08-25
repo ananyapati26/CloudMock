@@ -1,14 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios"; // 1. Import axios
-// import { formatDistanceToNow } from "date-fns"; 
+// import { formatDistanceToNow } from "date-fns";
 
 interface Activity {
   id: string;
   type: string;
   title: string;
   project: string;
-//   time: string;
+  //   time: string;
   status: string;
   method: string;
 }
@@ -20,7 +20,7 @@ interface EndpointResponse {
     id: string;
     name: string;
   };
-  createdAt: string; 
+  createdAt: string;
 }
 
 export default function RecentActivity() {
@@ -28,7 +28,6 @@ export default function RecentActivity() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 3. Fetch data from the API inside useEffect
   useEffect(() => {
     const fetchRecentEndpoints = async () => {
       try {
@@ -43,22 +42,24 @@ export default function RecentActivity() {
         }
 
         const response = await axios.post<EndpointResponse[]>(
-          "/api/AllEndpoints",
+          "/api/projects/AllEndpoints",
           {
             userId: userId,
-            limit: 5, 
-          }
+            limit: 5,
+          },
+          { headers: { "Content-Type": "application/json" } }
         );
+        console.log(response);
 
         const transformedActivities = response.data.map((endpoint) => ({
           id: endpoint.id,
           type: "endpoint",
           title: "Endpoint Created",
-          project: endpoint.collection.name, 
-        //   time: formatDistanceToNow(new Date(endpoint.createdAt), {
-        //     addSuffix: true,
-        //   }),
-          status: "success", 
+          project: endpoint.collection.name,
+          //   time: formatDistanceToNow(new Date(endpoint.createdAt), {
+          //     addSuffix: true,
+          //   }),
+          status: "success",
           method: endpoint.method,
         }));
 
