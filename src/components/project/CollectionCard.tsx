@@ -71,8 +71,8 @@ export default function CollectionCard({
         method: selectedMethod,
       });
       setEndpoints([...endpoints, res.data]);
-    } catch (error: any) {
-      if (error.response?.status === 409) {
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 409) {
         alert(`Endpoint with method ${selectedMethod} already exists.`);
       } else {
         console.error(error);

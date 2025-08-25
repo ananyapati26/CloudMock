@@ -1,12 +1,16 @@
 import { db } from "@/src/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
+import { Prisma } from "@prisma/client";
 
 type RouteParams = {
   userId: string;
   slug: string;
   path: string;
 };
+
+// Each item in endpoint response
+type ResponseItem = Record<string, unknown> & { id: string };
 
 async function findEndpoint(userId: string, slug: string, path: string, method: string) {
   const project = await db.project.findFirst({ where: { slug, userId } });
@@ -24,34 +28,34 @@ async function findEndpoint(userId: string, slug: string, path: string, method: 
   return { endpoint, collection };
 }
 
-
 // ✅ GET
 export async function GET(req: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { userId, slug, path } = await params;
     const { error, status, endpoint } = await findEndpoint(userId, slug, path, "GET");
     if (error) return NextResponse.json({ error }, { status });
-    return NextResponse.json(endpoint!.response || []);
+
+    return NextResponse.json((endpoint!.response as ResponseItem[]) || []);
   } catch (err) {
     console.error("GET error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-// ✅ POST (Add)
+// ✅ POST
 export async function POST(req: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { userId, slug, path } = await params;
-    const body = await req.json();
+    const body: Omit<ResponseItem, "id"> = await req.json();
     const { error, status, endpoint, collection } = await findEndpoint(userId, slug, path, "POST");
     if (error) return NextResponse.json({ error }, { status });
 
-    let data = Array.isArray(endpoint!.response) ? endpoint!.response : [];
-    const newItem = { id: randomUUID(), ...body };
+    const data: ResponseItem[] = Array.isArray(endpoint!.response) ? (endpoint!.response as ResponseItem[]) : [];
+    const newItem: ResponseItem = { id: randomUUID(), ...body };
     data.push(newItem);
 
-    await db.endpoint.update({ where: { id: endpoint!.id }, data: { response: data } });
-    await db.collection.update({ where: { id: collection!.id }, data: { baseData: data } });
+    await db.endpoint.update({ where: { id: endpoint!.id }, data: { response: data as Prisma.JsonValue } });
+    await db.collection.update({ where: { id: collection!.id }, data: { baseData: data as Prisma.JsonValue } });
 
     return NextResponse.json(newItem, { status: 201 });
   } catch (err) {
@@ -60,25 +64,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<Route
   }
 }
 
-// ✅ PUT (Replace)
+// ✅ PUT
 export async function PUT(req: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { userId, slug, path } = await params;
-    const body = await req.json();
-    const { id, ...rest } = body;
-    if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    const body: ResponseItem = await req.json();
+    if (!body.id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
 
     const { error, status, endpoint, collection } = await findEndpoint(userId, slug, path, "PUT");
     if (error) return NextResponse.json({ error }, { status });
 
-    let data = Array.isArray(endpoint!.response) ? endpoint!.response : [];
-    const index = data.findIndex((item: any) => item.id === id);
+    const data: ResponseItem[] = Array.isArray(endpoint!.response) ? (endpoint!.response as ResponseItem[]) : [];
+    const index = data.findIndex((item) => item.id === body.id);
     if (index === -1) return NextResponse.json({ error: "Item not found" }, { status: 404 });
 
-    data[index] = { id, ...rest };
+    data[index] = body;
 
-    await db.endpoint.update({ where: { id: endpoint!.id }, data: { response: data } });
-    await db.collection.update({ where: { id: collection!.id }, data: { baseData: data } });
+    await db.endpoint.update({ where: { id: endpoint!.id }, data: { response: data as Prisma.JsonValue } });
+    await db.collection.update({ where: { id: collection!.id }, data: { baseData: data as Prisma.JsonValue } });
 
     return NextResponse.json(data[index]);
   } catch (err) {
@@ -87,29 +90,24 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<RouteP
   }
 }
 
-// ✅ PATCH (Update specific fields)
+// ✅ PATCH
 export async function PATCH(req: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { userId, slug, path } = await params;
-    const body = await req.json();
-    const { id, ...rest } = body;
-    if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    const body: Partial<Omit<ResponseItem, "id">> & { id: string } = await req.json();
+    if (!body.id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
 
     const { error, status, endpoint, collection } = await findEndpoint(userId, slug, path, "PATCH");
     if (error) return NextResponse.json({ error }, { status });
 
-    let data = Array.isArray(endpoint!.response) ? endpoint!.response : [];
-    const index = data.findIndex((item: any) => item.id === id);
+    const data: ResponseItem[] = Array.isArray(endpoint!.response) ? (endpoint!.response as ResponseItem[]) : [];
+    const index = data.findIndex((item) => item.id === body.id);
     if (index === -1) return NextResponse.json({ error: "Item not found" }, { status: 404 });
 
-    if (typeof data[index] === "object" && data[index] !== null && typeof rest === "object" && rest !== null) {
-      data[index] = { ...data[index], ...rest };
-    } else {
-      return NextResponse.json({ error: "Invalid data for update" }, { status: 400 });
-    }
+    data[index] = { ...data[index], ...body };
 
-    await db.endpoint.update({ where: { id: endpoint!.id }, data: { response: data } });
-    await db.collection.update({ where: { id: collection!.id }, data: { baseData: data } });
+    await db.endpoint.update({ where: { id: endpoint!.id }, data: { response: data as Prisma.JsonValue } });
+    await db.collection.update({ where: { id: collection!.id }, data: { baseData: data as Prisma.JsonValue } });
 
     return NextResponse.json(data[index]);
   } catch (err) {
@@ -122,20 +120,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<Rout
 export async function DELETE(req: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { userId, slug, path } = await params;
-    const body = await req.json();
-    const { id } = body;
-    if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    const body: { id: string } = await req.json();
+    if (!body.id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
 
     const { error, status, endpoint, collection } = await findEndpoint(userId, slug, path, "DELETE");
     if (error) return NextResponse.json({ error }, { status });
 
-    let data = Array.isArray(endpoint!.response) ? endpoint!.response : [];
-    const filtered = data.filter((item: any) => item.id !== id);
-    if (filtered.length === data.length)
-      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+    const data: ResponseItem[] = Array.isArray(endpoint!.response) ? (endpoint!.response as ResponseItem[]) : [];
+    const filtered = data.filter((item) => item.id !== body.id);
+    if (filtered.length === data.length) return NextResponse.json({ error: "Item not found" }, { status: 404 });
 
-    await db.endpoint.update({ where: { id: endpoint!.id }, data: { response: filtered } });
-    await db.collection.update({ where: { id: collection!.id }, data: { baseData: filtered } });
+    await db.endpoint.update({ where: { id: endpoint!.id }, data: { response: filtered as Prisma.JsonValue } });
+    await db.collection.update({ where: { id: collection!.id }, data: { baseData: filtered as Prisma.JsonValue } });
 
     return NextResponse.json({ message: "Deleted successfully", data: filtered });
   } catch (err) {

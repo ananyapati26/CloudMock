@@ -66,7 +66,11 @@ export async function POST(
         });
 
         return NextResponse.json(endpoint, { status: 201 });
-    } catch (error: any) {
+        } catch (error) {
+        if (error && typeof error === "object" && "isAxiosError" in error && (error as import("axios").AxiosError).isAxiosError) {
+            const axiosError = error as import("axios").AxiosError;
+            return NextResponse.json({ error: axiosError.message }, { status: axiosError.response?.status || 500 });
+        }
         console.error("CreateEndpoint error:", error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
