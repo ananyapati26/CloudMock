@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
         console.log("called")
 
 
-        const result = await model.generateContent(prompt + 'generate dummy data for this in json format')
+        const result = await model.generateContent(prompt + 'generate dummy data for this in json format and id field is compulsory in it')
         console.log(result)
         const response = await result.response;
         const output = await response.text();

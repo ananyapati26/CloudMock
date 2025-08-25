@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 type RouteParams = {
     slug: string;
-}
+};
 
 export async function POST(
     req: NextRequest,
@@ -26,29 +26,48 @@ export async function POST(
         const body = await req.json();
         const { collectionId, method, userId } = body;
 
-        const collection = await db.collection.findUnique({
-            where: { id: collectionId },
-        });
-
-        if (!collection) {
-            return NextResponse.json({ error: 'Collection not found' }, { status: 404 });
+        if (!collectionId || !method) {
+            return NextResponse.json({ error: 'collectionId and method are required' }, { status: 400 });
         }
 
-        if(!userId){
+        if (!userId) {
             return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
         }
 
+        // Validate collection belongs to this project
+        const collection = await db.collection.findFirst({
+            where: { id: collectionId, projectId: project.id },
+        });
+
+        if (!collection) {
+            return NextResponse.json({ error: 'Collection not found or does not belong to project' }, { status: 404 });
+        }
+
+        // Check for existing endpoint with same method
+        const existingEndpoint = await db.endpoint.findFirst({
+            where: { collectionId, method },
+        });
+
+        if (existingEndpoint) {
+            return NextResponse.json({ error: `Endpoint with method ${method} already exists` }, { status: 409 });
+        }
+
+        // Create endpoint with default values
         const endpoint = await db.endpoint.create({
             data: {
                 collectionId,
                 method,
                 userId,
-                response: collection.baseData,
+                projectId: project.id,
+                statusCode: 200,
+                delay: 0,
+                response: collection.baseData || [], // fallback to empty array
             },
         });
 
-        return NextResponse.json(endpoint);
-    } catch (error) {
+        return NextResponse.json(endpoint, { status: 201 });
+    } catch (error: any) {
+        console.error("CreateEndpoint error:", error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

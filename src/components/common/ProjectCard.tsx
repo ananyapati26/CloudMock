@@ -54,7 +54,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   };
 
   return (
-    <div className="flex items-start justify-between p-5 bg-slate-900/60 backdrop-blur-lg rounded-xl border border-slate-800 w-full h-[140px] gap-3 shadow-md hover:shadow-lg hover:border-blue-500/50 transition-all duration-300 group">
+    <div className="flex items-start justify-between p-5 bg-slate-900/60 backdrop-blur-lg rounded-xl border border-slate-800 w-full h-[120px] gap-3 shadow-md hover:shadow-lg hover:border-blue-500/50 transition-all duration-300 group">
       {/* Left side - Icon and Project Info */}
       <div className="flex items-start gap-3 flex-1 min-w-0">
         <div className="flex-shrink-0 mt-1">
