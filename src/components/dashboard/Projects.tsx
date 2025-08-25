@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ProjectCard from "../common/ProjectCard";
@@ -9,8 +8,10 @@ interface Project {
   name: string;
   desc: string | null;
   slug: string;
+  status?: 'Active' | 'Draft' | 'Inactive';
   _count: {
     collections: number;
+    endpoints?: number;
   };
 }
 
@@ -26,13 +27,22 @@ export default function ProjectsCards(): React.ReactNode {
         setLoading(false);
         return;
       }
-
       const response = await axios.post("/api/projects/AllProjects", {
         userId,
         limit: 5,
       });
-
-      setProjects(response.data);
+      
+      // Add mock status and endpoints count for demo
+      const projectsWithStatus = response.data.map((project: Project, index: number) => ({
+        ...project,
+        status: index === 0 ? 'Active' : index === 1 ? 'Active' : 'Draft',
+        _count: {
+          ...project._count,
+          endpoints: Math.floor(Math.random() * 20) + 5 // Mock endpoints count
+        }
+      }));
+      
+      setProjects(projectsWithStatus);
     } catch (error) {
       console.error("Error fetching projects:", error);
     } finally {
@@ -46,19 +56,64 @@ export default function ProjectsCards(): React.ReactNode {
 
   if (loading) {
     return (
-      <div className="p-6 text-center text-slate-400 bg-slate-900 rounded-xl shadow-md">
-        Loading projects...
+      <div className="flex flex-row flex-wrap justify-start items-start gap-6">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="w-[350px] h-[140px] bg-slate-900/60 rounded-xl p-5 animate-pulse flex items-center gap-4">
+            <div className="w-12 h-12 bg-slate-700 rounded-xl flex-shrink-0"></div>
+            <div className="flex-1 space-y-2">
+              <div className="w-32 h-5 bg-slate-700 rounded"></div>
+              <div className="w-48 h-4 bg-slate-700 rounded"></div>
+              <div className="flex gap-4 text-sm">
+                <div className="w-20 h-4 bg-slate-700 rounded"></div>
+                <div className="w-24 h-4 bg-slate-700 rounded"></div>
+              </div>
+            </div>
+            <div className="flex flex-col justify-between h-full py-1">
+              <div className="w-16 h-6 bg-slate-700 rounded-full"></div>
+              <div className="w-5 h-5 bg-slate-700 rounded"></div>
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
 
   if (projects.length === 0) {
     return (
-      <div className="p-6 text-center text-slate-400 bg-slate-900 rounded-xl shadow-md">
-        No projects found. Create your first project!
+      <div className="w-[350px] h-[140px] bg-slate-900/60 rounded-xl p-5 text-center flex flex-col justify-center items-center">
+        <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center mb-4">
+          <span className="text-2xl">📁</span>
+        </div>
+        <h3 className="text-lg font-medium text-white mb-2">No projects found</h3>
+        <p className="text-slate-400 text-sm">Create your first project to get started</p>
       </div>
     );
   }
+
+  const getStatusBadge = (status: string) => {
+    const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
+    switch (status) {
+      case 'Active':
+        return `${baseClasses} bg-green-500/20 text-green-400`;
+      case 'Draft':
+        return `${baseClasses} bg-yellow-500/20 text-yellow-400`;
+      case 'Inactive':
+        return `${baseClasses} bg-slate-500/20 text-slate-400`;
+      default:
+        return `${baseClasses} bg-blue-500/20 text-blue-400`;
+    }
+  };
+
+  const getProjectIcon = (name: string) => {
+    if (name.toLowerCase().includes('ecommerce') || name.toLowerCase().includes('commerce')) {
+      return '🛒';
+    } else if (name.toLowerCase().includes('user') || name.toLowerCase().includes('auth')) {
+      return '👥';
+    } else if (name.toLowerCase().includes('content') || name.toLowerCase().includes('blog')) {
+      return '📝';
+    }
+    return '🔧';
+  };
 
   return (
     <div className="flex flex-row flex-wrap justify-start items-start gap-6">
@@ -70,6 +125,8 @@ export default function ProjectsCards(): React.ReactNode {
           desc={project.desc || "No description"}
           slug={project.slug}
           collectionsCount={project._count.collections}
+          status={project.status}
+          endpointsCount={project._count.endpoints}
         />
       ))}
     </div>
