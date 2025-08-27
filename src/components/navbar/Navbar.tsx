@@ -70,7 +70,7 @@ export default function Navbar() {
   return (
     <div className="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-900/50 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-        {/* Logo */}
+     
         <div
           className="text-2xl font-bold cursor-pointer bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent hover:opacity-90 transition"
           onClick={() => router.push("/dashboard")}
@@ -79,8 +79,8 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-6">
-          <Link href="#" className="text-slate-400 hover:text-white transition">
-            Projects
+          <Link href="/apitesting" className="text-slate-400 hover:text-white transition">
+            Testing
           </Link>
 
           <Dialog open={open} onOpenChange={setOpen}>
