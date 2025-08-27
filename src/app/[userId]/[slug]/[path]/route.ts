@@ -28,14 +28,34 @@ async function findEndpoint(userId: string, slug: string, path: string, method: 
   return { endpoint, collection };
 }
 
-// ✅ GET
+
 export async function GET(req: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { userId, slug, path } = await params;
     const { error, status, endpoint } = await findEndpoint(userId, slug, path, "GET");
     if (error) return NextResponse.json({ error }, { status });
 
-    return NextResponse.json((endpoint!.response as ResponseItem[]) || []);
+    const searchParams = req.nextUrl.searchParams;
+    const allData = (endpoint!.response as ResponseItem[]) || [];
+    const id = searchParams.get('id');
+    if (id) {
+      const item = allData.find((d) => String(d.id) === id);
+      if (item) {
+        return NextResponse.json(item);
+      }
+      return NextResponse.json({ error: `Item with id ${id} not found` }, { status: 404 });
+    }
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const pageSize = searchParams.get('pageSize'); 
+    if (pageSize) {
+      const size = parseInt(pageSize, 10);
+      const startIndex = (page - 1) * size;
+      const endIndex = startIndex + size;
+      const paginatedData = allData.slice(startIndex, endIndex);
+      return NextResponse.json(paginatedData);
+    }
+    return NextResponse.json(allData);
+
   } catch (err) {
     console.error("GET error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
