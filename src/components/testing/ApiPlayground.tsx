@@ -121,7 +121,7 @@ export default function ApiPlayground() {
                 <Button
                     onClick={handleSendRequest}
                     disabled={isLoading}
-                    className="h-11 w-[110px] rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-semibold text-white transition-all hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 shadow-lg"
+                    className="h-11 w-[110px] rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-semibold text-white transition-all hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 shadow-lg cursor-pointer"
                 >
                     {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Send"}
                 </Button>

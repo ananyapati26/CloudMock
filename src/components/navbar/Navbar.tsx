@@ -14,7 +14,7 @@ import {
 import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Tooltip,
   TooltipContent,
@@ -23,7 +23,6 @@ import {
 import axios, { AxiosError } from "axios";
 import Link from "next/link";
 
-
 export default function Navbar() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -31,7 +30,9 @@ export default function Navbar() {
   const [desc, setDesc] = useState("");
   const [slug, setSlug] = useState("");
   const [userId, setUserId] = useState("");
-  
+
+  const pathname = usePathname();
+
   useEffect(() => {
     const storedId = localStorage.getItem("userId");
     if (storedId) setUserId(storedId);
@@ -64,13 +65,11 @@ export default function Navbar() {
         alert(err.response?.data?.message || "Failed to create project");
       }
     }
-    
   };
 
   return (
     <div className="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-900/50 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-     
         <div
           className="text-2xl font-bold cursor-pointer bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent hover:opacity-90 transition"
           onClick={() => router.push("/dashboard")}
@@ -79,94 +78,99 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-6">
-          <Link href="/apitesting" className="text-slate-400 hover:text-white transition">
+          <Link
+            href="/apitesting"
+            className="text-slate-400 hover:text-white transition"
+          >
             Testing
           </Link>
 
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Add Project
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-slate-900 text-white border border-slate-700 rounded-xl">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-semibold">
+          {pathname.includes("/dashboard") ? (
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                   Add Project
-                </DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit}>
-                <div className="grid gap-4 mt-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="name-1" className="text-slate-300">
-                      Project Name
-                    </Label>
-                    <Input
-                      id="name-1"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Project Name"
-                      className="bg-slate-800 border-slate-700 text-white"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="description" className="text-slate-300">
-                      Description
-                    </Label>
-                    <Textarea
-                      id="description"
-                      value={desc}
-                      onChange={(e) => setDesc(e.target.value)}
-                      placeholder="Description"
-                      className="bg-slate-800 border-slate-700 text-white"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="slug" className="text-slate-300">
-                      Base URL Path
-                    </Label>
-                    <div className="flex gap-2">
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Input
-                            disabled
-                            value={`${process.env.NEXT_PUBLIC_API_URL}/${userId}`}
-                            className="bg-slate-800 border-slate-700 text-white"
-                          />
-                        </TooltipTrigger>
-                        <TooltipContent side={"bottom"}>
-                          <p>{`${process.env.NEXT_PUBLIC_API_URL}/${userId}`}</p>
-                        </TooltipContent>
-                      </Tooltip>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-900 text-white border border-slate-700 rounded-xl">
+                <DialogHeader>
+                  <DialogTitle className="text-lg font-semibold">
+                    Add Project
+                  </DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit}>
+                  <div className="grid gap-4 mt-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="name-1" className="text-slate-300">
+                        Project Name
+                      </Label>
                       <Input
-                        id="slug"
-                        value={slug}
-                        onChange={(e) => setSlug(e.target.value)}
-                        placeholder="slug"
+                        id="name-1"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Project Name"
                         className="bg-slate-800 border-slate-700 text-white"
                       />
                     </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="description" className="text-slate-300">
+                        Description
+                      </Label>
+                      <Textarea
+                        id="description"
+                        value={desc}
+                        onChange={(e) => setDesc(e.target.value)}
+                        placeholder="Description"
+                        className="bg-slate-800 border-slate-700 text-white"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="slug" className="text-slate-300">
+                        Base URL Path
+                      </Label>
+                      <div className="flex gap-2">
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Input
+                              disabled
+                              value={`${process.env.NEXT_PUBLIC_API_URL}/${userId}`}
+                              className="bg-slate-800 border-slate-700 text-white"
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent side={"bottom"}>
+                            <p>{`${process.env.NEXT_PUBLIC_API_URL}/${userId}`}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <Input
+                          id="slug"
+                          value={slug}
+                          onChange={(e) => setSlug(e.target.value)}
+                          placeholder="slug"
+                          className="bg-slate-800 border-slate-700 text-white"
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <DialogFooter className="mt-6">
-                  <DialogClose asChild>
+                  <DialogFooter className="mt-6">
+                    <DialogClose asChild>
+                      <Button
+                        variant="outline"
+                        className="border-slate-600 text-black"
+                      >
+                        Cancel
+                      </Button>
+                    </DialogClose>
                     <Button
-                      variant="outline"
-                      className="border-slate-600 text-black"
+                      type="submit"
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      Cancel
+                      Save changes
                     </Button>
-                  </DialogClose>
-                  <Button
-                    type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    Save changes
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          ) : null}
         </div>
       </div>
     </div>

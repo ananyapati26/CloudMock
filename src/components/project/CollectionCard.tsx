@@ -91,7 +91,6 @@ export default function CollectionCard({
 
   return (
     <div className="bg-gray-900 rounded-3xl p-8 shadow-2xl border border-gray-700 text-gray-200">
-      {/* Create Endpoint */}
       <div className="flex items-center space-x-4 mb-4">
         <select
           value={selectedMethod}
@@ -106,7 +105,7 @@ export default function CollectionCard({
         </select>
         <Button
           onClick={createEndpoint}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
         >
           <Plus className="h-4 w-4 mr-2" /> Create Endpoint
         </Button>
@@ -114,7 +113,6 @@ export default function CollectionCard({
 
       <p className="text-gray-400 text-base mb-4">{description}</p>
 
-      {/* Endpoints List */}
       <div className="mb-6">
         {loading ? (
           <p className="text-gray-400 text-sm">Loading...</p>
@@ -157,7 +155,6 @@ export default function CollectionCard({
         )}
       </div>
 
-      {/* Sample Response */}
       <div className="mb-6">
         <h3 className="font-semibold text-gray-200 mb-3">Sample Response</h3>
         <pre className="bg-gray-800 p-4 rounded-xl text-xs overflow-x-auto text-gray-300 h-60 overflow-y-auto">

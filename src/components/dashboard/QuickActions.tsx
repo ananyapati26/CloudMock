@@ -17,7 +17,7 @@ export default function QuickActions() {
       icon: "➕",
       bgColor: "bg-blue-500/10",
       iconColor: "text-blue-400",
-      onClick: () => setShowNewProject(true), // Show component
+      onClick: () => setShowNewProject(true), 
     },
     {
       id: 2,
@@ -42,12 +42,12 @@ export default function QuickActions() {
   return (
     <div>
       <h3 className="text-xl font-bold mb-4 text-white">Quick Actions</h3>
-      <div className="bg-slate-900/50 rounded-xl p-4 space-y-3">
+      <div className="bg-slate-900/50 rounded-xl p-4 space-y-3 mt-6">
         {actions.map((action) => (
           <button
             key={action.id}
             onClick={action.onClick}
-            className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800/50 transition-colors group"
+            className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800/50 transition-colors group cursor-pointer"
           >
             <div
               className={`w-10 h-10 rounded-lg ${action.bgColor} flex items-center justify-center`}
@@ -64,25 +64,6 @@ export default function QuickActions() {
         ))}
       </div>
 
-      {/* {showNewProject && (
-        <div className="mt-6 bg-slate-800 p-4 rounded-xl text-white">
-          <h4 className="text-lg font-semibold mb-2">Create New Project</h4>
-          <p className="text-slate-400 mb-3">
-            Here you can create your new API project.
-          </p>
-          <input
-            type="text"
-            placeholder="Project name"
-            className="w-full mb-3 p-2 rounded bg-slate-700 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            onClick={() => setShowNewProject(false)}
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-semibold"
-          >
-            Create Project
-          </button>
-        </div>
-      )} */}
     </div>
   );
 }

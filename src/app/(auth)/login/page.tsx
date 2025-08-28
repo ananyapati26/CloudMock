@@ -24,7 +24,6 @@ import {
     CardContent,
     CardFooter,
 } from "@/src/components/ui/card";
-// import { useToast } from "@/src/components/ui/use-toast";
 import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 const LoginSchema = z.object({
@@ -64,7 +63,6 @@ export default function LoginPage() {
                 error.response?.data?.message ||
                 "Login failed. Check your credentials and try again.";
 
-            // toast({ title: "Oops", description: serverMsg, variant: "destructive" });
             form.setError("email", { message: "" });
             form.setError("password", { message: "" });
         }

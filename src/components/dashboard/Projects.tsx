@@ -29,16 +29,15 @@ export default function ProjectsCards(): React.ReactNode {
       }
       const response = await axios.post("/api/projects/AllProjects", {
         userId,
-        limit: 5,
+        // limit: 5,
       });
       
-      // Add mock status and endpoints count for demo
       const projectsWithStatus = response.data.map((project: Project, index: number) => ({
         ...project,
         status: index === 0 ? 'Active' : index === 1 ? 'Active' : 'Draft',
         _count: {
           ...project._count,
-          endpoints: Math.floor(Math.random() * 20) + 5 // Mock endpoints count
+          endpoints: Math.floor(Math.random() * 20) + 5 
         }
       }));
       
@@ -90,30 +89,7 @@ export default function ProjectsCards(): React.ReactNode {
     );
   }
 
-  const getStatusBadge = (status: string) => {
-    const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
-    switch (status) {
-      case 'Active':
-        return `${baseClasses} bg-green-500/20 text-green-400`;
-      case 'Draft':
-        return `${baseClasses} bg-yellow-500/20 text-yellow-400`;
-      case 'Inactive':
-        return `${baseClasses} bg-slate-500/20 text-slate-400`;
-      default:
-        return `${baseClasses} bg-blue-500/20 text-blue-400`;
-    }
-  };
 
-  const getProjectIcon = (name: string) => {
-    if (name.toLowerCase().includes('ecommerce') || name.toLowerCase().includes('commerce')) {
-      return '🛒';
-    } else if (name.toLowerCase().includes('user') || name.toLowerCase().includes('auth')) {
-      return '👥';
-    } else if (name.toLowerCase().includes('content') || name.toLowerCase().includes('blog')) {
-      return '📝';
-    }
-    return '🔧';
-  };
 
   return (
     <div className="flex flex-row flex-wrap justify-start items-start gap-6">
